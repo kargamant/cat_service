@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include <enviroments.h>
+#include "Cat.h"
 
 int main(int argc, char* argv[])
 {
@@ -37,6 +38,10 @@ int main(int argc, char* argv[])
 	{
 	    int dgrlen = recvfrom(RecvSocket, RecvBuf, CAT_BUFF_SIZE, 0, (SOCKADDR *)&SendAddr, &sckaddrsize);
 	    printf("Received %d bytes from %s\n", dgrlen, inet_ntoa(SendAddr.sin_addr));
+        printf("Message: %s\n", RecvBuf);
+
+        std::string cat_response = Cat::process_message(RecvBuf);
+        sendto(RecvSocket, cat_response.c_str(), cat_response.length(), 0, (SOCKADDR*)&SendAddr, sckaddrsize);
 	}
 	closesocket(RecvSocket);
 	WSACleanup();

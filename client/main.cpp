@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 	{
         char* msg = (char*)malloc(CAT_BUFF_SIZE);
         printf("enter message to send: ");
-        scanf("%s", msg);
+        scanf("%[^\n]%*c", msg);
 
         if(*msg == EOF)
         {
@@ -41,8 +41,13 @@ int main(int argc, char* argv[])
 			RecvAddr.sin_addr.s_addr = inet_addr(SERVER_IPADDR);
 			printf("Sending '%s' to the %s...\n", msg, SERVER_IPADDR);
 			sendto(SendSocket, msg, CAT_BUFF_SIZE, 0, (SOCKADDR *) &RecvAddr, sizeof(RecvAddr));
+            int sz = sizeof(RecvAddr);
+            memset(msg, 0, CAT_BUFF_SIZE);
+            recvfrom(SendSocket, msg, CAT_BUFF_SIZE, 0, (SOCKADDR *)&RecvAddr, &sz);
+            printf("Cat response: %s\n", msg);
         }
 	}
+    printf("Closing client\n");
 	closesocket(SendSocket);
 	WSACleanup();
 	return 0;
