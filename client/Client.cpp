@@ -1,20 +1,12 @@
 #include <Client.h>
 #include <iostream>
 
-Client::Client(int buff_size, const char* client_ipaddr) : buff_size(buff_size), 
-                                SendSocketUDP(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)),
-                                SendSocketTCP(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))
+Client::Client(int buff_size, const char* client_ipaddr) : Handler(buff_size, client_ipaddr)
 {
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_addr.s_addr = inet_addr(client_ipaddr);
-    bind(SendSocketUDP, (SOCKADDR *) &client_addr, sizeof(client_addr));
-    bind(SendSocketTCP, (SOCKADDR *) &client_addr, sizeof(client_addr));
-}
-
-Client::~Client()
-{
-    closesocket(SendSocketUDP);
-    closesocket(SendSocketTCP);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(client_ipaddr);
+    bind(SocketUDP, (SOCKADDR *) &addr, sizeof(addr));
+    bind(SocketTCP, (SOCKADDR *) &addr, sizeof(addr));
 }
 
 std::vector<std::string> Client::feed_request(const std::string& message, const char* server_ipaddr, unsigned short port)
@@ -38,12 +30,12 @@ std::vector<std::string> Client::feed_request(const std::string& message, const 
 
         //setting bc option and sending
         BOOL OptionValue=false;
-        setsockopt(SendSocketUDP, SOL_SOCKET, SO_BROADCAST, (char*)& OptionValue, sizeof(OptionValue));
-        sendto(SendSocketUDP, msg, buff_size, 0, (SOCKADDR *) &RecvAddr, sizeof(RecvAddr));
+        setsockopt(SocketUDP, SOL_SOCKET, SO_BROADCAST, (char*)& OptionValue, sizeof(OptionValue));
+        sendto(SocketUDP, msg, buff_size, 0, (SOCKADDR *) &RecvAddr, sizeof(RecvAddr));
         
         int sz = sizeof(RecvAddr);
         memset(msg, 0, buff_size);
-        recvfrom(SendSocketUDP, msg, buff_size, 0, (SOCKADDR *)&RecvAddr, &sz);
+        recvfrom(SocketUDP, msg, buff_size, 0, (SOCKADDR *)&RecvAddr, &sz);
         std::string response{msg};
         free(msg);
 
@@ -76,12 +68,12 @@ std::vector<std::string> Client::feed_request(const std::string& message, const 
 
 
             BOOL OptionValue=false;
-            setsockopt(SendSocketUDP, SOL_SOCKET, SO_BROADCAST, (char*)& OptionValue, sizeof(OptionValue));
-            sendto(SendSocketUDP, msg, buff_size, 0, (SOCKADDR *) &RecvAddr, sizeof(RecvAddr));
+            setsockopt(SocketUDP, SOL_SOCKET, SO_BROADCAST, (char*)& OptionValue, sizeof(OptionValue));
+            sendto(SocketUDP, msg, buff_size, 0, (SOCKADDR *) &RecvAddr, sizeof(RecvAddr));
             
             int sz = sizeof(RecvAddr);
             memset(msg, 0, buff_size);
-            recvfrom(SendSocketUDP, msg, buff_size, 0, (SOCKADDR *)&RecvAddr, &sz);
+            recvfrom(SocketUDP, msg, buff_size, 0, (SOCKADDR *)&RecvAddr, &sz);
             cat_responses.push_back(msg);
             free(msg);
         }
