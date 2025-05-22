@@ -6,7 +6,9 @@ Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_p
 {
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(server_port);
-	addr.sin_addr.s_addr = inet_addr(server_ipaddr);	
+	addr.sin_addr.s_addr = inet_addr(server_ipaddr);
+    bind(SocketUDP, (SOCKADDR *) &addr, sizeof(addr));
+    bind(SocketTCP, (SOCKADDR *) &addr, sizeof(addr));	
 }
 
 char* Server::poll_socket(SOCKET* sock)

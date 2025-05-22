@@ -8,10 +8,11 @@ class Cat
     private:
         static const std::set<std::string> accepted_food;
         static std::regex msg_re;
+        static std::regex seg_re;
 
-        std::unordered_map<std::string, std::string> ip_dgram_map;
+        std::unordered_map<std::string, std::string> user_dgram_map;
     public:
         Cat() {}
 
-        static std::string process_message(char* buff);
+        static std::string process_message(char* buff, char* ipaddr);
 };

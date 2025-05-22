@@ -3,12 +3,19 @@
 
 const std::set<std::string> Cat::accepted_food = {"martini", "beer", "tequila", "jin", "whiskey", "cigarette"};
 std::regex Cat::msg_re{"@[a-zA-Z0-9]+ - ([a-zA-Z0-9]+)~"};
+std::regex Cat::seg_re{".+~([0-9]|[1-9][0-9]+)"};
 
 
-std::string Cat::process_message(char* buff)
+std::string Cat::process_message(char* buff, char* ipaddr)
 {
     std::string msg{buff};
     std::smatch match;
+
+    if(std::regex_match(msg, match, seg_re))
+    {
+        
+    }
+
     std::regex_match(msg, match, msg_re);
 
     if (accepted_food.find(match.str(1)) != accepted_food.end())

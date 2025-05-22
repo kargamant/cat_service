@@ -4,15 +4,28 @@
 #include <enviroments.h>
 #include <Cat.h>
 #include <Server.h>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	
-	Server server{CAT_BUFF_SIZE, SERVER_IPADDR};
+	Server server{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT};
 	Cat cat;
 
+	while (!_kbhit())
+	{
+		std::cout << "Cat is listening..." << std::endl;
+		
+		char* buf = server.poll_udp();
+
+		std::string cat_response = cat.process_message(buf);
+
+		free(buf);
+		server.respond_udp(cat_response);
+	}
+	std::cout << "Cat closed. Bye!" << std::endl;
 	WSACleanup();
 	// char RecvBuf[CAT_BUFF_SIZE];
 	// SOCKET RecvSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
