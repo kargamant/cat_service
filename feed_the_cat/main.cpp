@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 	sockaddr_in RecvAddr;
 	RecvAddr.sin_family = AF_INET;
 	RecvAddr.sin_port = htons(FEED_PORT);
-	RecvAddr.sin_addr.s_addr = INADDR_ANY;
+	RecvAddr.sin_addr.s_addr = inet_addr(SERVER_IPADDR);
 	
 	sockaddr_in SendAddr;
 	int sckaddrsize = sizeof(sockaddr_in);
