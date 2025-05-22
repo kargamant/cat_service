@@ -19,8 +19,7 @@ Client::~Client()
 
 std::vector<std::string> Client::feed_request(const std::string& message, const char* server_ipaddr, unsigned short port)
 {
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2,2), &wsaData);
+
 
     //creating addr for server
 	sockaddr_in RecvAddr;
@@ -48,7 +47,6 @@ std::vector<std::string> Client::feed_request(const std::string& message, const 
         std::string response{msg};
         free(msg);
 
-        WSACleanup();
         return {response};
     }
     else
@@ -78,7 +76,6 @@ std::vector<std::string> Client::feed_request(const std::string& message, const 
             free(msg);
         }
 
-        WSACleanup();
         return cat_responses;
     }
 }
