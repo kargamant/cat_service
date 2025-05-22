@@ -52,18 +52,28 @@ std::vector<std::string> Client::feed_request(const std::string& message, const 
     else
     {
         std::vector<std::string> cat_responses;
-        for(int i=0; i<message.length()/buff_size; i++)
+        for(int i=0; i<message.length()/(buff_size-2) + 1; i++)
         {
             // cutting out segment
-            std::string segment = message.substr(i*(buff_size-2), std::min<int>((i+1)*(buff_size-2), message.length()));
-            segment += "~";
-            segment += std::to_string(i);
+            std::string segment = message.substr(i*(buff_size-2), buff_size-2);
+            int seg_sz = segment.length();
+
+            if(seg_sz == buff_size -2)
+            {
+                segment += "~";
+                segment += std::to_string(i);
+            }
+
+            // std::cout << "bounds: " << i*(buff_size-2) << (i+1)*(buff_size-2) << std::endl;
+            // std::cout << "segment: " << segment << std::endl;
+            // std::cout << "mesage: " << message.length() << std::endl;
 
             // allocating payload with segment data
             char* msg = (char*)malloc(buff_size);
             const char* str = segment.c_str();
             memcpy(msg, str, segment.length());
             msg[segment.length()] = 0;
+
 
             BOOL OptionValue=false;
             setsockopt(SendSocketUDP, SOL_SOCKET, SO_BROADCAST, (char*)& OptionValue, sizeof(OptionValue));

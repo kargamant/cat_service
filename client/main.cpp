@@ -10,6 +10,7 @@
 
 int main(int argc, char* argv[])
 {
+    // example: @YadykinIgorMihailovich007 - whiskey~
     WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	

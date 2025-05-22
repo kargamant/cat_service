@@ -8,7 +8,6 @@ std::regex Cat::msg_re{"@[a-zA-Z0-9]+ - ([a-zA-Z0-9]+)~"};
 std::string Cat::process_message(char* buff)
 {
     std::string msg{buff};
-    std::cout << "cat recieved: " << msg <<std::endl;
     std::smatch match;
     std::regex_match(msg, match, msg_re);
 
