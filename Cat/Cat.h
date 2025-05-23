@@ -12,6 +12,13 @@ enum class CatState
     Error
 };
 
+struct CatResponse
+{
+    std::string message;
+    std::string client_name;
+    CatState state;
+};
+
 class Cat
 {
     private:
@@ -23,5 +30,5 @@ class Cat
     public:
         Cat() {}
 
-        static std::pair<std::string, CatState> process_message(const std::string& msg);
+        static CatResponse process_message(const std::string& msg);
 };

@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	
-	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT};
+	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
 
 	while (!_kbhit())
 	{
