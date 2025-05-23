@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 	
 	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
 
-	while (!_kbhit())
+	while (!kbhit())
 	{
 		std::cout << "Cat is listening..." << std::endl;
 		

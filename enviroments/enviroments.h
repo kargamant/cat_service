@@ -7,6 +7,6 @@ const unsigned short STATS_PORT = 5555;
 const int CAT_BUFF_SIZE = 25;
 char* SERVER_IPADDR = "192.168.1.39";
 char* CLIENT_IPADDR = "192.168.1.43";
-const char* LOG_FILE_NAME = "cat_log.txt";
+const char* LOG_FILE_NAME = "../cat_log.txt";
 
 #endif

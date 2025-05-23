@@ -6,6 +6,7 @@
 Orchestrator::Orchestrator(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port, const std::string& log_file) : 
 server(buff_size, server_ipaddr, server_udp_port, server_tcp_port), log_file(log_file)
 {
+    load_db();
 }
 
 char* Orchestrator::listen_feed_port()
@@ -41,7 +42,7 @@ std::string Orchestrator::process_feed_request(char* buff)
     }
     
     if(cat_response.state == CatState::Eaten || cat_response.state == CatState::Ignore)
-        log_response(cat_response);
+        user_response_db[cat_response.client_name].push_back((int)cat_response.state);
     return cat_response.message;
 }
 
@@ -58,10 +59,37 @@ void Orchestrator::run_feed()
     free(buf);
 	
     feed_response(cat_response);
+    offload_db();
 }
 
-void Orchestrator::log_response(CatResponse& cr)
+void Orchestrator::load_db()
 {
-    std::ofstream log{log_file, std::ios::app};
-    log << cr.client_name << " " << ((int)cr.state) << std::endl;
+    std::ifstream log{log_file, std::ios::in};
+    
+    std::regex log_re{"([a-zA-Z0-9]+) ([0-9])"};
+    std::smatch match;
+
+    while(!log.eof())
+    {
+        std::string line;
+        std::getline(log, line);
+
+        if(std::regex_match(line, match, log_re))
+        {
+            std::string user_name = match.str(1);
+            int code = stoi(match.str(2));
+            user_response_db[user_name].push_back(code);
+        }
+    }
+}
+
+void Orchestrator::offload_db()
+{
+    std::ofstream log{log_file, std::ios::out};
+
+    for(auto& user: user_response_db)
+    {
+        for(auto& response: user.second)
+            log << user.first << " " << response << std::endl;
+    }
 }
