@@ -7,7 +7,9 @@ enum class CatState
 {
     Eaten,
     Ignore,
-    Amused
+    Amused,
+    EndOfSeg,
+    Error
 };
 
 class Cat
@@ -16,9 +18,10 @@ class Cat
         static const std::set<std::string> accepted_food;
         static std::regex msg_re;
         static std::regex seg_re;
+        static std::regex end_seg_re;
 
     public:
         Cat() {}
 
-        static std::pair<std::string, CatState> process_message(char* buff);
+        static std::pair<std::string, CatState> process_message(const std::string& msg);
 };

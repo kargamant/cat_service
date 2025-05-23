@@ -47,3 +47,18 @@ void Server::respond_tcp(const std::string& payload)
 {
     respond_socket(&SocketTCP, (SOCKADDR*)&tcp_addr, payload);
 }
+
+char* Server::get_ip(sockaddr_in* sockaddr)
+{
+    return inet_ntoa(sockaddr->sin_addr);
+}
+
+std::string Server::get_ip_udp()
+{
+    return get_ip(&udp_addr);
+}
+
+std::string Server::get_ip_tcp()
+{
+    return get_ip(&tcp_addr);
+}
