@@ -2,43 +2,48 @@
 
 int Server::sckaddrsize = sizeof(sockaddr_in);
 
-Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_port) : Handler(buff_size, server_ipaddr)
+Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port) : Handler(buff_size, server_ipaddr)
 {
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(server_port);
-	addr.sin_addr.s_addr = inet_addr(server_ipaddr);
-    bind(SocketUDP, (SOCKADDR *) &addr, sizeof(addr));
-    bind(SocketTCP, (SOCKADDR *) &addr, sizeof(addr));	
+	udp_addr.sin_family = AF_INET;
+	udp_addr.sin_port = htons(server_udp_port);
+	udp_addr.sin_addr.s_addr = inet_addr(server_ipaddr);
+
+	tcp_addr.sin_family = AF_INET;
+	tcp_addr.sin_port = htons(server_tcp_port);
+	tcp_addr.sin_addr.s_addr = inet_addr(server_ipaddr);
+
+    bind(SocketUDP, (SOCKADDR *) &udp_addr, sizeof(udp_addr));
+    bind(SocketTCP, (SOCKADDR *) &tcp_addr, sizeof(tcp_addr));	
 }
 
-char* Server::poll_socket(SOCKET* sock)
+char* Server::poll_socket(SOCKET* sock, SOCKADDR* addr)
 {
     char* RecvBuf = (char*)malloc(buff_size);
-    recvfrom(*sock, RecvBuf, buff_size, 0, (SOCKADDR *)&addr, &sckaddrsize);
+    recvfrom(*sock, RecvBuf, buff_size, 0, addr, &sckaddrsize);
     return RecvBuf;
 }
 
 char* Server::poll_udp()
 {
-    return poll_socket(&SocketUDP);
+    return poll_socket(&SocketUDP, (SOCKADDR*)&udp_addr);
 }
 
 char* Server::poll_tcp()
 {
-    return poll_socket(&SocketTCP);
+    return poll_socket(&SocketTCP, (SOCKADDR*)&tcp_addr);
 }
 
-void Server::respond_socket(SOCKET* sock, const std::string& payload)
+void Server::respond_socket(SOCKET* sock, SOCKADDR* addr, const std::string& payload)
 {
-    sendto(*sock, payload.c_str(), payload.length(), 0, (SOCKADDR*)&addr, sckaddrsize);
+    sendto(*sock, payload.c_str(), payload.length(), 0, addr, sckaddrsize);
 }
 
 void Server::respond_udp(const std::string& payload)
 {
-    respond_socket(&SocketUDP, payload);
+    respond_socket(&SocketUDP, (SOCKADDR*)&udp_addr, payload);
 }
 
 void Server::respond_tcp(const std::string& payload)
 {
-    respond_socket(&SocketTCP, payload);
+    respond_socket(&SocketTCP, (SOCKADDR*)&tcp_addr, payload);
 }

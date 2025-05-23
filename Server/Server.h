@@ -8,10 +8,13 @@ class Server : public Handler
 {
     private:
         static int sckaddrsize;
-        char* poll_socket(SOCKET* sock);
-        void respond_socket(SOCKET* sock, const std::string& payload);
+        sockaddr_in udp_addr;
+        sockaddr_in tcp_addr;
+
+        char* poll_socket(SOCKET* sock, SOCKADDR* addr);
+        void respond_socket(SOCKET* sock, SOCKADDR* addr, const std::string& payload);
     public:
-        Server(int buff_size, const char* server_ipaddr, unsigned short server_port);
+        Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port);
 
         char* poll_udp();
         char* poll_tcp();

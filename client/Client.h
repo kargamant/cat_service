@@ -6,6 +6,8 @@
 
 class Client : public Handler
 {
+    private:
+        sockaddr_in addr;
     public:
         Client(int buff_size, const char* client_ipaddr);
 

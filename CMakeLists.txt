@@ -20,4 +20,6 @@ add_subdirectory(Cat)
 add_subdirectory(Client)
 add_subdirectory(Handler)
 add_subdirectory(Server)
+add_subdirectory(Orchestrator)
 add_subdirectory(feed_the_cat)
+

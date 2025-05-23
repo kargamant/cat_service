@@ -3,6 +3,13 @@
 #include <regex>
 #include <unordered_map>
 
+enum class CatState
+{
+    Eaten,
+    Ignore,
+    Amused
+};
+
 class Cat
 {
     private:
@@ -10,9 +17,8 @@ class Cat
         static std::regex msg_re;
         static std::regex seg_re;
 
-        std::unordered_map<std::string, std::string> user_dgram_map;
     public:
         Cat() {}
 
-        static std::string process_message(char* buff, char* ipaddr);
+        static std::pair<std::string, CatState> process_message(char* buff);
 };
