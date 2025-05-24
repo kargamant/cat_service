@@ -7,13 +7,12 @@
 
 int main(int argc, char* argv[])
 {
-	std::cout << "hui" << std::endl;
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	
 	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
 
-	bool tcp_mode = !strcmp(argv[1], "-t");
+	bool tcp_mode = argc > 1 ? !strcmp(argv[1], "-t") : false;
 	while (!kbhit())
 	{
 		std::cout << "Cat is listening..." << std::endl;

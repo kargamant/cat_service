@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	
     Client client{CAT_BUFF_SIZE, CLIENT_IPADDR};
 
-    bool tcp_mode = !strcmp(argv[1], "-t");
+    bool tcp_mode = argc > 1 ? !strcmp(argv[1], "-t") : false;
     
     if(tcp_mode && !client.connect_server(SERVER_IPADDR, PET_PORT))
     {
