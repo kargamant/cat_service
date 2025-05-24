@@ -38,6 +38,50 @@ Traffic:
 ![frag_request_exp](https://github.com/user-attachments/assets/d39549e3-0534-434f-9c22-50c70c3dfd95)  
 ![frag_response_exp](https://github.com/user-attachments/assets/61c00a36-f11f-48f5-a364-9af071e17e8b)  
 full dump [here](https://disk.yandex.ru/d/S98YmRUaVea2fw)  
+  
+## DB integration  
+To keep the service simple, a single file was introduced as a database.  It loads into program when server starts and offloads after every response.  
+If a user succesfully fed the cat then ``` user 0 ``` will be written in cat_log.txt file. If not then ``` user 1 ```.  
+Example:  
+![cat_log_db](https://github.com/user-attachments/assets/9da1f5fc-2d06-4caa-bca7-a575dc7a1d2f)  
+
+# Pet the cat service  
+
+The cat also likes to play. But not with all users. The chance of succesful play with cat is total_succesful_requests/total_requests.  
+If a play was succesful again 0 is written to DB for that user. If not then 2 is written to DB for that user. Also there is a tiny 5 percent chance that cat will fall asleep and not respond anymore.  
+The only data sent is nickname of a user.  
+
+Requests and responses for that service are sent via TCP. So prior connection between server and client is established.  
+Here is a basic communication:  
+![tcp_console_dialogue](https://github.com/user-attachments/assets/9aea538d-b4f4-4e5a-86b2-f6196d3c6ea2)  
+Traffic:  
+![tcp_request_exp](https://github.com/user-attachments/assets/ea4b5a06-f24d-452e-afc3-a5fabda84967)  
+
+![tcp_tol_response](https://github.com/user-attachments/assets/af532c74-b1ac-4a9f-ac93-2753f4cc30d3)  
+
+![tcp_bite_response](https://github.com/user-attachments/assets/a66f5bc5-d24e-4e12-9e93-abe4631c9a86)  
+![tcp_bored_response](https://github.com/user-attachments/assets/ab0da28f-1ec1-4920-8754-e1b9066b4371)  
+
+full dump [here](https://disk.yandex.ru/d/Upa0I-zkK_oGEw)  
+
+TCP data is a stream divided in segments, so segments can contain any portion of data.  
+Therefore it was decided to make fragmenting mechanisms and ability to respond to a sequence of requests in one segment.  
+
+## Sequence requests  
+Sequence request is something like following:  
+```
+@123~@aboba~@Vladimir777~
+```
+It can contain any number of nicknames.  So when cat recieves this sequence it iterates through all nickname matches and give it response according to database.  
+Then All responses are accumulated into one big response with type Default.  But importantly, if one of responses was Sleep response(cat is tired) then after sending this big accumulated response connection is closing.  
+
+Here is an example:  
+![stream_tcp_console_dialogue](https://github.com/user-attachments/assets/05c572f3-fa8c-4799-a54a-453aa352277c)  
+full dump [here](https://disk.yandex.ru/d/bjWgIqtEBRvlkw)  
+
+
+
+
 
 
 
