@@ -51,18 +51,14 @@ CatResponse Cat::pet(const std::string& user, double chance)
     return {"Tolerated by the Cat", user, CatState::Tolerate};
 }
 
-std::vector<CatResponse> Cat::process_stream(const std::string& stream)
+std::vector<CatResponse> Cat::process_stream(std::string stream)
 {
     std::vector<CatResponse> result;
     
     for(std::smatch users; std::regex_search(stream, users, user_name_re);)
     {
         result.emplace_back("Cat is looking at you", users.str(1), CatState::Looking);
-    }
-
-    for(auto& resp: result)
-    {
-        std::cout << resp.message << " " << resp.client_name << " " << ((int)resp.state) << std::endl;
+        stream = users.suffix();
     }
 
     if(result.empty())

@@ -87,7 +87,11 @@ CatResponse Orchestrator::process_pet_request(char* buff)
 
     CatResponse response{"", "", CatState::Default};
     for(auto& resp: payload)
+    {
         response.message += resp.message;
+        if(resp.state == CatState::Sleep)
+            response.state = CatState::Sleep;
+    }
 
     return response;
 }
@@ -99,18 +103,18 @@ void Orchestrator::pet_response(const std::string& response)
 
 bool Orchestrator::run_pet()
 {
-    //std::cout << "listening" << std::endl;
+    std::cout << "listening" << std::endl;
     char* buf = listen_pet_port();
 
     if(!buf)
         return false;
 
-    //std::cout << "processing" << std::endl;
+    std::cout << "processing" << std::endl;
     //printf("buff: %d\n", strlen(buf));
     CatResponse cat_response = process_pet_request(buf);
     free(buf);
 	
-    //std::cout << "responding" << std::endl;
+    std::cout << "responding" << std::endl;
     pet_response(cat_response.message);
     offload_db();
 

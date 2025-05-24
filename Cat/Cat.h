@@ -39,6 +39,6 @@ class Cat
         Cat() {}
 
         static CatResponse process_message(const std::string& msg);
-        static std::vector<CatResponse> process_stream(const std::string& stream);
+        static std::vector<CatResponse> process_stream(std::string stream);
         static CatResponse pet(const std::string& user, double chance);
 };
