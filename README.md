@@ -26,7 +26,8 @@ And the traffic is following:
 ![pos_response](https://github.com/user-attachments/assets/bbd13e7c-f011-4b5f-bff7-e679e40825ac)  
 full dump [here](https://disk.yandex.ru/d/GVCHHr0cq9z_Rw)  
 
-Also fragmentation was made.  So if a client have a very long nickname that does not fit in buff_size, then several UDP fragments will be sent.  
+## Fragmentation  
+If a client has a very long nickname that does not fit in buff_size, then several UDP fragments will be sent.  
 The format of fragment is following:  
 ```
 <fragment_data>~<number_of_fragment>
@@ -47,8 +48,8 @@ Example:
 
 # Pet the cat service  
 
-The cat also likes to play. But not with all users. The chance of succesful play with cat is total_succesful_requests/total_requests.  
-If a play was succesful again 0 is written to DB for that user. If not then 2 is written to DB for that user. Also there is a tiny 5 percent chance that cat will fall asleep and not respond anymore.  
+The cat also likes to play. But not with all users. The chance of succesful play with cat is ```total_succesful_requests/total_requests```.  
+If a play was succesful 0 is written to DB for that user. If not then 2 is written to DB for that user. Also there is a tiny 5 percent chance that cat will fall asleep and not respond anymore.  
 The only data sent is nickname of a user.  
 
 Requests and responses for that service are sent via TCP. So prior connection between server and client is established.  
@@ -61,13 +62,13 @@ Traffic:
 
 ![tcp_bite_response](https://github.com/user-attachments/assets/a66f5bc5-d24e-4e12-9e93-abe4631c9a86)  
 ![tcp_bored_response](https://github.com/user-attachments/assets/ab0da28f-1ec1-4920-8754-e1b9066b4371)  
-
+> Worth noticing that RST is sent when cat falls asleep. Pretty much like in real life.
+  
 full dump [here](https://disk.yandex.ru/d/Upa0I-zkK_oGEw)  
 
+## Sequence requests  
 TCP data is a stream divided in segments, so segments can contain any portion of data.  
 Therefore it was decided to make fragmenting mechanisms and ability to respond to a sequence of requests in one segment.  
-
-## Sequence requests  
 Sequence request is something like following:  
 ```
 @123~@aboba~@Vladimir777~
@@ -78,6 +79,44 @@ Then All responses are accumulated into one big response with type Default.  But
 Here is an example:  
 ![stream_tcp_console_dialogue](https://github.com/user-attachments/assets/05c572f3-fa8c-4799-a54a-453aa352277c)  
 full dump [here](https://disk.yandex.ru/d/bjWgIqtEBRvlkw)  
+
+## Fragmentation  
+If a nickname is very big, then it should be sent in separate segments and collected properely on server side. For that purpose server has separate buffer for every IP it handles communication with.  
+So cat will collect all segments until it finds at least a submatch. If a submatch in a stream was found then the response will be sent and buffer flushed(for more details you can see the Orchestrator class in code).  
+Here is an example:  
+![frag_tcp_console_dialogue](https://github.com/user-attachments/assets/6df49dcc-8483-4e54-8dc4-ae9a1af16835)  
+full dump [here](https://disk.yandex.ru/d/DbntEKClPwxVqQ)  
+
+## Sequence fragmentation💀  
+If a sequence request does not fit in buff_size... It should be splitted into several segments :)  
+The mechanism is the same as for fragmentation of one request. Segments are gathered into buffer, accumulated and if there is a match, response is given.  
+Example:  
+![multiple_stream_tcp_console_dialogue](https://github.com/user-attachments/assets/dfebc654-6dfc-4e44-a4b2-0eaf84cbd6d6)  
+full dump [here](https://disk.yandex.ru/d/48Jgu_moeIcp8w)  
+
+## DB updates  
+In TCP service if a client succesfully plays with a cat it gets 0 and unsuccesful attempt give client 2 points.  
+cat_log.txt example:  
+![image](https://github.com/user-attachments/assets/9bee0ff6-a239-4918-a780-d53e224e316d)  
+
+# Build  
+### requirements  
+```
+windows system that supports winsock2  
+cmake 3.28+  
+winsock2  
+ninja 1.12+
+```
+In order to build run the following.  
+```
+$ cmake.exe -S . -B build
+$ cd build
+$ ninja.exe
+```
+> Actually, it is worth trying to build it with building systems other than ninja, but I personally use it.
+> Also, it is worth trying to rewrite it for linux since linux does not support winsock2 :)
+  
+All dumps can be found [here](https://disk.yandex.ru/d/KM6fBp7XFxZS0Q)
 
 
 
