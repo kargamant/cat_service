@@ -98,6 +98,7 @@ std::vector<std::string> Client::pet_request(const std::string& message, const c
         buff[message.length()] = 0;
 
         send(SocketTCP, buff, buff_size, 0);
+        memset(buff, 0, buff_size);
         int bytes = recv(SocketTCP, buff, buff_size, 0 );
         if(bytes==-1)
             return {};
@@ -106,15 +107,18 @@ std::vector<std::string> Client::pet_request(const std::string& message, const c
     else
     {
         std::vector<std::string> responses;
-        for(int i=0; i<message.length()/buff_size + 1; i++)
+        for(int i=0; i<message.length()/(buff_size-1) + 1; i++)
         {
-            std::string segment = message.substr(i*buff_size, buff_size);
+            std::string segment = message.substr(i*(buff_size-1), (buff_size-1));
             
             char* buff = (char*)malloc(buff_size);
-            memcpy(buff, segment.c_str(), buff_size);
+            memcpy(buff, segment.c_str(), buff_size-1);
+            buff[buff_size] = 0;
 
             send(SocketTCP, buff, buff_size, 0);
+            memset(buff, 0, buff_size);
             int bytes = recv(SocketTCP, buff, buff_size, 0 );
+            buff[buff_size] = 0;
             if(bytes==-1 || bytes==0)
                 responses.push_back("");
             responses.push_back(buff);
