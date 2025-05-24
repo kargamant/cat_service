@@ -7,6 +7,7 @@
 
 int main(int argc, char* argv[])
 {
+	std::cout << "hui" << std::endl;
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	

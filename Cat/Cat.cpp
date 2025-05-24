@@ -9,6 +9,10 @@ std::regex Cat::end_seg_re{".+~"};
 std::regex Cat::user_name_re{"@([a-zA-Z0-9]+)~"};
 
 
+CatResponse::CatResponse(const std::string& message, const std::string& client_name, CatState state) : message(message), client_name(client_name), state(state)
+{
+}
+
 CatResponse Cat::process_message(const std::string& msg)
 {
     std::smatch match;
@@ -46,3 +50,26 @@ CatResponse Cat::pet(const std::string& user, double chance)
         return {"Cat is bored(and drunk). Fell Asleep.", user, CatState::Sleep};
     return {"Tolerated by the Cat", user, CatState::Tolerate};
 }
+
+std::vector<CatResponse> Cat::process_stream(const std::string& stream)
+{
+    std::vector<CatResponse> result;
+    
+    for(std::smatch users; std::regex_search(stream, users, user_name_re);)
+    {
+        result.emplace_back("Cat is looking at you", users.str(1), CatState::Looking);
+    }
+
+    for(auto& resp: result)
+    {
+        std::cout << resp.message << " " << resp.client_name << " " << ((int)resp.state) << std::endl;
+    }
+
+    if(result.empty())
+    {
+        result.emplace_back("Cat got error :(", "", CatState::Error);
+    }
+
+    return result;
+}
+

@@ -13,6 +13,7 @@ enum class CatState
     Bite,
     Tolerate,
     Sleep,
+    Default,
     Error
 };
 
@@ -21,6 +22,8 @@ struct CatResponse
     std::string message;
     std::string client_name;
     CatState state;
+
+    CatResponse(const std::string& message, const std::string& client_name, CatState state);
 };
 
 class Cat
@@ -36,5 +39,6 @@ class Cat
         Cat() {}
 
         static CatResponse process_message(const std::string& msg);
+        static std::vector<CatResponse> process_stream(const std::string& stream);
         static CatResponse pet(const std::string& user, double chance);
 };

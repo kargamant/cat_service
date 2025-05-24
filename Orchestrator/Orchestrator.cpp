@@ -69,15 +69,25 @@ char* Orchestrator::listen_pet_port()
 
 CatResponse Orchestrator::process_pet_request(char* buff)
 {
-    CatResponse response = cat.process_message(buff);
+    std::vector<CatResponse> payload = cat.process_stream(buff);
 
-    if(user_response_db.find(response.client_name)!=user_response_db.end())
+    if(payload[0].state == CatState::Error)
+        return payload[0];
+    
+    for(auto& response: payload)
     {
-        auto& vec = user_response_db[response.client_name];
-        double total_ignores = (double)std::accumulate(vec.begin(), vec.end(), 0);
-        double chance = total_ignores / vec.size();
-        response = cat.pet(response.client_name, chance);
+        if(user_response_db.find(response.client_name)!=user_response_db.end())
+        {
+            auto& vec = user_response_db[response.client_name];
+            double total_ignores = (double)std::accumulate(vec.begin(), vec.end(), 0);
+            double chance = total_ignores / vec.size();
+            response = cat.pet(response.client_name, chance);
+        }
     }
+
+    CatResponse response{"", "", CatState::Default};
+    for(auto& resp: payload)
+        response.message += resp.message;
 
     return response;
 }
