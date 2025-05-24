@@ -13,39 +13,68 @@ Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_u
 	tcp_addr.sin_addr.s_addr = inet_addr(server_ipaddr);
 
     bind(SocketUDP, (SOCKADDR *) &udp_addr, sizeof(udp_addr));
-    bind(SocketTCP, (SOCKADDR *) &tcp_addr, sizeof(tcp_addr));	
-}
-
-char* Server::poll_socket(SOCKET* sock, SOCKADDR* addr)
-{
-    char* RecvBuf = (char*)malloc(buff_size);
-    recvfrom(*sock, RecvBuf, buff_size, 0, addr, &sckaddrsize);
-    return RecvBuf;
+    bind(SocketTCP, (SOCKADDR *) &tcp_addr, sizeof(tcp_addr));
 }
 
 char* Server::poll_udp()
 {
-    return poll_socket(&SocketUDP, (SOCKADDR*)&udp_addr);
+    char* RecvBuf = (char*)malloc(buff_size);
+    recvfrom(SocketUDP, RecvBuf, buff_size, 0, (SOCKADDR*)&udp_addr, &sckaddrsize);
+    return RecvBuf;
 }
 
 char* Server::poll_tcp()
 {
-    return poll_socket(&SocketTCP, (SOCKADDR*)&tcp_addr);
-}
+    // Listen on the socket.
+    //printf("is_listening: %d\n", is_listening);
+    if(!is_listening)
+    {
+        if (listen(SocketTCP, 1 ) == SOCKET_ERROR)
+            return "";
+        is_listening = true;
+    }
 
-void Server::respond_socket(SOCKET* sock, SOCKADDR* addr, const std::string& payload)
-{
-    sendto(*sock, payload.c_str(), payload.length(), 0, addr, sckaddrsize);
+    // Accept connections.
+    int connection_time = 0;
+    int option_sz = sizeof(int);
+    getsockopt(SocketTCP, SOL_SOCKET, SO_CONNECT_TIME, (char*)&connection_time, &option_sz);
+    //printf("conn_time: %d\n", connection_time);
+    if(connection_time == -1)
+    {
+        SOCKET AcceptSocket;
+        while (1) {
+            AcceptSocket = SOCKET_ERROR;
+            while ( AcceptSocket == SOCKET_ERROR ) {
+                AcceptSocket = accept(SocketTCP, NULL, NULL);
+            }
+            SocketTCP = AcceptSocket; 
+            break;
+        }
+    }
+
+    char* RecvBuf = (char*)malloc(buff_size);
+    int bytes = recv(SocketTCP, RecvBuf, buff_size, 0 );
+    if(bytes == -1)
+    {
+        free(RecvBuf);
+        return NULL;
+    }
+
+    while(!bytes && bytes != WSAECONNRESET)
+    {
+        bytes = recv(SocketTCP, RecvBuf, buff_size, 0 );
+    }
+    return RecvBuf;
 }
 
 void Server::respond_udp(const std::string& payload)
 {
-    respond_socket(&SocketUDP, (SOCKADDR*)&udp_addr, payload);
+    sendto(SocketUDP, payload.c_str(), payload.length(), 0, (SOCKADDR*)&udp_addr, sckaddrsize);
 }
 
 void Server::respond_tcp(const std::string& payload)
 {
-    respond_socket(&SocketTCP, (SOCKADDR*)&tcp_addr, payload);
+    send(SocketTCP, payload.c_str(), payload.length(), 0 );
 }
 
 char* Server::get_ip(sockaddr_in* sockaddr)

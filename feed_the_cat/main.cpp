@@ -12,11 +12,19 @@ int main(int argc, char* argv[])
 	
 	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
 
+	bool tcp_mode = !strcmp(argv[1], "-t");
 	while (!kbhit())
 	{
 		std::cout << "Cat is listening..." << std::endl;
 		
-		orch.run_feed();
+		if(tcp_mode)
+		{
+			bool res = orch.run_pet();
+			if(!res)
+				break;
+		}
+		else
+			orch.run_feed();
 	}
 	std::cout << "Cat closed. Bye!" << std::endl;
 	WSACleanup();

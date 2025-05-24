@@ -62,6 +62,41 @@ void Orchestrator::run_feed()
     offload_db();
 }
 
+char* Orchestrator::listen_pet_port()
+{
+    return server.poll_tcp();
+}
+
+std::string Orchestrator::process_pet_request(char* buff)
+{
+    return "aboba";
+}
+
+void Orchestrator::pet_response(const std::string& response)
+{
+    server.respond_tcp(response);
+}
+
+bool Orchestrator::run_pet()
+{
+    //std::cout << "listening" << std::endl;
+    char* buf = listen_pet_port();
+
+    if(!buf)
+        return false;
+
+    //std::cout << "processing" << std::endl;
+    //printf("buff: %d\n", strlen(buf));
+    std::string cat_response = process_pet_request(buf);
+    free(buf);
+	
+    //std::cout << "responding" << std::endl;
+    pet_response(cat_response);
+    offload_db();
+
+    return true;
+}
+
 void Orchestrator::load_db()
 {
     std::ifstream log{log_file, std::ios::in};

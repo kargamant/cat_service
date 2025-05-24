@@ -1,5 +1,7 @@
 #pragma once
 #include <winsock2.h>
+#include <ws2def.h>
+#include <mswsock.h>
 #include <string>
 #include <vector>
 #include <Handler.h>
@@ -10,10 +12,9 @@ class Server : public Handler
         static int sckaddrsize;
         sockaddr_in udp_addr;
         sockaddr_in tcp_addr;
+        bool is_listening=false;
 
-        char* poll_socket(SOCKET* sock, SOCKADDR* addr);
         char* get_ip(sockaddr_in* sockaddr);
-        void respond_socket(SOCKET* sock, SOCKADDR* addr, const std::string& payload);
     public:
         Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port);
 

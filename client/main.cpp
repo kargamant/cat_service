@@ -17,6 +17,15 @@ int main(int argc, char* argv[])
 	
     Client client{CAT_BUFF_SIZE, CLIENT_IPADDR};
 
+    bool tcp_mode = !strcmp(argv[1], "-t");
+    
+    if(tcp_mode && !client.connect_server(SERVER_IPADDR, PET_PORT))
+    {
+        std::cout << "Initial connect failed" << std::endl;
+        WSACleanup();
+	    return 1;
+    }
+
     BOOL flag = true;
     while(flag)
     {
@@ -30,12 +39,15 @@ int main(int argc, char* argv[])
         }
         else
         {
-            auto responses = client.feed_request(message, SERVER_IPADDR, FEED_PORT);
+            auto responses = tcp_mode ? client.pet_request(message, SERVER_IPADDR, PET_PORT) : 
+                                        client.feed_request(message, SERVER_IPADDR, FEED_PORT);
+            if(tcp_mode && responses.empty())
+                break;
             for(auto& response: responses)
                 std::cout << "Cat response: " << response << std::endl;
         }
     }
-    client.~Client();
+    std::cout << "Client closed" << std::endl;
     WSACleanup();
     
 	return 0;
