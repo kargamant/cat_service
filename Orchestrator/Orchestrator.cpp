@@ -72,7 +72,24 @@ CatResponse Orchestrator::process_pet_request(char* buff)
     std::vector<CatResponse> payload = cat.process_stream(buff);
 
     if(payload[0].state == CatState::Error)
-        return payload[0];
+    {
+        std::string peer_ip = server.get_peer_ip_tcp();
+        if(user_segment_map.find(peer_ip) != user_segment_map.end())
+            user_segment_map[peer_ip] += buff;
+        else
+        {
+            user_segment_map[peer_ip] = "";
+            user_segment_map[peer_ip] += buff;
+        }
+        std::cout << "peer_ip: " << peer_ip << std::endl;
+        std::cout << "accumulated segment: " << user_segment_map[peer_ip] << std::endl;
+        payload = cat.process_stream(user_segment_map[peer_ip]);
+        
+        if(payload[0].state == CatState::Error)
+            return payload[0];
+        else
+            user_segment_map[peer_ip].clear();
+    }
     
     for(auto& response: payload)
     {

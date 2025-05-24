@@ -91,14 +91,34 @@ bool Client::connect_server(const char* server_ipaddr, unsigned short port)
 
 std::vector<std::string> Client::pet_request(const std::string& message, const char* server_ipaddr, unsigned short port)
 {
-    char* buff = (char*)malloc(buff_size);
-    memcpy(buff, message.c_str(), message.length());
-    buff[message.length()] = 0;
+    if(message.length() <= buff_size)
+    {
+        char* buff = (char*)malloc(buff_size);
+        memcpy(buff, message.c_str(), message.length());
+        buff[message.length()] = 0;
 
-    send(SocketTCP, buff, buff_size, 0);
-    int bytes = recv(SocketTCP, buff, buff_size, 0 );
-    if(bytes==-1)
-        return {};
+        send(SocketTCP, buff, buff_size, 0);
+        int bytes = recv(SocketTCP, buff, buff_size, 0 );
+        if(bytes==-1)
+            return {};
+        return {buff};
+    }
+    else
+    {
+        std::vector<std::string> responses;
+        for(int i=0; i<message.length()/buff_size + 1; i++)
+        {
+            std::string segment = message.substr(i*buff_size, buff_size);
+            
+            char* buff = (char*)malloc(buff_size);
+            memcpy(buff, segment.c_str(), buff_size);
 
-    return {buff};
+            send(SocketTCP, buff, buff_size, 0);
+            int bytes = recv(SocketTCP, buff, buff_size, 0 );
+            if(bytes==-1 || bytes==0)
+                responses.push_back("");
+            responses.push_back(buff);
+        }
+        return responses;
+    }
 }

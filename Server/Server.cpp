@@ -91,3 +91,11 @@ std::string Server::get_ip_tcp()
 {
     return get_ip(&tcp_addr);
 }
+
+std::string Server::get_peer_ip_tcp()
+{
+    sockaddr paddr;
+    int sz = sizeof(paddr);
+    getpeername(SocketTCP, &paddr, &sz);
+    return paddr.sa_data;
+}

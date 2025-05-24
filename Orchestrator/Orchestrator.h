@@ -9,6 +9,7 @@ class Orchestrator
         std::string log_file;
         
         std::unordered_map<std::string, std::vector<std::string>> user_dgram_map;
+        std::unordered_map<std::string, std::string> user_segment_map;
         std::unordered_map<std::string, std::vector<int>> user_response_db;
 
         char* listen_feed_port();

@@ -25,4 +25,5 @@ class Server : public Handler
 
         std::string get_ip_udp();
         std::string get_ip_tcp();
+        std::string get_peer_ip_tcp();
 };
