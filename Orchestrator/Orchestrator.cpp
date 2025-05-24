@@ -99,6 +99,11 @@ CatResponse Orchestrator::process_pet_request(char* buff)
             double total_ignores = (double)std::accumulate(vec.begin(), vec.end(), 0);
             double chance = total_ignores / vec.size();
             response = cat.pet(response.client_name, chance);
+
+            if(response.state == CatState::Bite)
+                user_response_db[response.client_name].push_back(2);
+            else if(response.state == CatState::Tolerate)
+                user_response_db[response.client_name].push_back(0);
         }
     }
 
@@ -110,6 +115,7 @@ CatResponse Orchestrator::process_pet_request(char* buff)
             response.state = CatState::Sleep;
     }
 
+    offload_db();
     return response;
 }
 
