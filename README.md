@@ -118,7 +118,13 @@ $ ninja.exe
   
 All dumps can be found [here](https://disk.yandex.ru/d/KM6fBp7XFxZS0Q)
 
+# Analysis of communication  
+These communication types have some dissadvantages. 
 
+**Feed the cat**. UDP is not very reliable. What if a fragment of request will be lost? On server side if an end of request(ends with tilda is recieved) then cat responds.  
+But it will respond with a format error if a fragment is not delivered. Moreover no authentication mechanism working. So any user can send request from any user_name and spoil score in database.  
+
+**Pet the cat**. TCP is more reliable, but it also have some problems related to stream interpretation here. Server doesn't know anything about full stream data. It recieves only segments. Therefore cat is not only responding slowly due to accumulating nickname data in buffers, but also can respond incorrectly if some nickname fall on a border of two segments. First half will be flushed after response and other one remain.  
 
 
 
