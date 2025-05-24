@@ -16,7 +16,7 @@ class Orchestrator
         void feed_response(const std::string& response);
         
         char* listen_pet_port();
-        std::string process_pet_request(char* buff);
+        CatResponse process_pet_request(char* buff);
         void pet_response(const std::string& response);
 
         void load_db();

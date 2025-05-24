@@ -67,9 +67,19 @@ char* Orchestrator::listen_pet_port()
     return server.poll_tcp();
 }
 
-std::string Orchestrator::process_pet_request(char* buff)
+CatResponse Orchestrator::process_pet_request(char* buff)
 {
-    return "aboba";
+    CatResponse response = cat.process_message(buff);
+
+    if(user_response_db.find(response.client_name)!=user_response_db.end())
+    {
+        auto& vec = user_response_db[response.client_name];
+        double total_ignores = (double)std::accumulate(vec.begin(), vec.end(), 0);
+        double chance = total_ignores / vec.size();
+        response = cat.pet(response.client_name, chance);
+    }
+
+    return response;
 }
 
 void Orchestrator::pet_response(const std::string& response)
@@ -87,12 +97,15 @@ bool Orchestrator::run_pet()
 
     //std::cout << "processing" << std::endl;
     //printf("buff: %d\n", strlen(buf));
-    std::string cat_response = process_pet_request(buf);
+    CatResponse cat_response = process_pet_request(buf);
     free(buf);
 	
     //std::cout << "responding" << std::endl;
-    pet_response(cat_response);
+    pet_response(cat_response.message);
     offload_db();
+
+    if(cat_response.state == CatState::Sleep)
+        return false;
 
     return true;
 }

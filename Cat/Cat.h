@@ -9,6 +9,10 @@ enum class CatState
     Ignore,
     Amused,
     EndOfSeg,
+    Looking,
+    Bite,
+    Tolerate,
+    Sleep,
     Error
 };
 
@@ -26,9 +30,11 @@ class Cat
         static std::regex msg_re;
         static std::regex seg_re;
         static std::regex end_seg_re;
+        static std::regex user_name_re;
 
     public:
         Cat() {}
 
         static CatResponse process_message(const std::string& msg);
+        static CatResponse pet(const std::string& user, double chance);
 };
