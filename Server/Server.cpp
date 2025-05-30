@@ -2,7 +2,7 @@
 
 int Server::sckaddrsize = sizeof(sockaddr_in);
 
-Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port) : Handler(buff_size, server_ipaddr)
+Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port, bool bind_tcp) : Handler(buff_size, server_ipaddr)
 {
 	udp_addr.sin_family = AF_INET;
 	udp_addr.sin_port = htons(server_udp_port);
@@ -12,8 +12,10 @@ Server::Server(int buff_size, const char* server_ipaddr, unsigned short server_u
 	tcp_addr.sin_port = htons(server_tcp_port);
 	tcp_addr.sin_addr.s_addr = inet_addr(server_ipaddr);
 
-    bind(SocketUDP, (SOCKADDR *) &udp_addr, sizeof(udp_addr));
-    bind(SocketTCP, (SOCKADDR *) &tcp_addr, sizeof(tcp_addr));
+    if(bind_tcp)
+        printf("bind_tcp: %d\n", bind(SocketTCP, (SOCKADDR *) &tcp_addr, sizeof(tcp_addr)));
+    else
+        printf("bind_udp: %d\n", bind(SocketUDP, (SOCKADDR *) &udp_addr, sizeof(udp_addr)));
 }
 
 char* Server::poll_udp()
@@ -30,7 +32,10 @@ char* Server::poll_tcp()
     if(!is_listening)
     {
         if (listen(SocketTCP, 1 ) == SOCKET_ERROR)
+        {
+            printf("Error code: %d\n", WSAGetLastError());
             return NULL;
+        }
         is_listening = true;
     }
 

@@ -3,8 +3,8 @@
 #include <numeric>
 #include <fstream>
 
-Orchestrator::Orchestrator(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port, const std::string& log_file) : 
-server(buff_size, server_ipaddr, server_udp_port, server_tcp_port), log_file(log_file)
+Orchestrator::Orchestrator(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port, bool server_bind_tcp, const std::string& log_file) : 
+server(buff_size, server_ipaddr, server_udp_port, server_tcp_port, server_bind_tcp), log_file(log_file)
 {
     load_db();
 }

@@ -20,7 +20,7 @@ class Server : public Handler
 
         char* get_ip(sockaddr_in* sockaddr);
     public:
-        Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port);
+        Server(int buff_size, const char* server_ipaddr, unsigned short server_udp_port, unsigned short server_tcp_port, bool bind_tcp);
 
         char* poll_udp();
         char* poll_tcp();

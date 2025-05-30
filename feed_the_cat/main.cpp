@@ -15,13 +15,15 @@ int main(int argc, char* argv[])
     if(ip_addr)
         SERVER_IPADDR = ip_addr;
 
+	bool tcp_mode = argc > 2 ? !strcmp(argv[2], "-t") : false;
+
 	std::cout << "Started up on: " << SERVER_IPADDR << std::endl;
 
-	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
+	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, tcp_mode, LOG_FILE_NAME};
 
 	std::cout << "Created orch" << std::endl;
 
-	bool tcp_mode = argc > 2 ? !strcmp(argv[2], "-t") : false;
+	
 	while (!kbhit())
 	{
 		std::cout << "Cat is listening..." << std::endl;
