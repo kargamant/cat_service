@@ -26,20 +26,17 @@ char* Server::poll_udp()
 char* Server::poll_tcp()
 {
     // Listen on the socket.
-    //printf("is_listening: %d\n", is_listening);
+    printf("is_listening: %d\n", is_listening);
     if(!is_listening)
     {
         if (listen(SocketTCP, 1 ) == SOCKET_ERROR)
-            return "";
+            return NULL;
         is_listening = true;
     }
 
     // Accept connections.
-    int connection_time = 0;
-    int option_sz = sizeof(int);
-    getsockopt(SocketTCP, SOL_SOCKET, SO_CONNECT_TIME, (char*)&connection_time, &option_sz);
-    //printf("conn_time: %d\n", connection_time);
-    if(connection_time == -1)
+    printf("is_connected: %d\n", is_connected);
+    if(!is_connected)
     {
         SOCKET AcceptSocket;
         while (1) {
@@ -47,23 +44,33 @@ char* Server::poll_tcp()
             while ( AcceptSocket == SOCKET_ERROR ) {
                 AcceptSocket = accept(SocketTCP, NULL, NULL);
             }
-            SocketTCP = AcceptSocket; 
+            is_connected = true;
+            last_client = AcceptSocket;
+            printf("connection established!\n");
             break;
         }
     }
 
+
+    printf("listening to client: %s\n", get_peer_ip_tcp());
+
     char* RecvBuf = (char*)malloc(buff_size);
-    int bytes = recv(SocketTCP, RecvBuf, buff_size, 0 );
-    if(bytes == -1)
+    int bytes = recv(last_client, RecvBuf, buff_size, 0 );
+    
+    printf("bytes: %d\n", bytes);
+    printf("recvbuf: %s\n", RecvBuf);
+    
+    if(bytes <= 0)
     {
+        if(!bytes)
+        {
+            closesocket(last_client);
+            is_connected = false;
+        }
         free(RecvBuf);
         return NULL;
     }
 
-    while(!bytes && bytes != WSAECONNRESET)
-    {
-        bytes = recv(SocketTCP, RecvBuf, buff_size, 0 );
-    }
     return RecvBuf;
 }
 
@@ -74,7 +81,7 @@ void Server::respond_udp(const std::string& payload)
 
 void Server::respond_tcp(const std::string& payload)
 {
-    send(SocketTCP, payload.c_str(), payload.length(), 0 );
+    send(last_client, payload.c_str(), payload.length(), 0 );
 }
 
 char* Server::get_ip(sockaddr_in* sockaddr)
@@ -96,6 +103,12 @@ std::string Server::get_peer_ip_tcp()
 {
     sockaddr paddr;
     int sz = sizeof(paddr);
-    getpeername(SocketTCP, &paddr, &sz);
+    getpeername(last_client, &paddr, &sz);
     return paddr.sa_data;
+}
+
+void Server::send_rst()
+{
+    closesocket(last_client);
+    is_connected = false;
 }

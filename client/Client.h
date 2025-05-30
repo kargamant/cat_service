@@ -14,4 +14,5 @@ class Client : public Handler
         std::vector<std::string> feed_request(const std::string& message, const char* server_ipaddr, unsigned short port);
         bool connect_server(const char* server_ipaddr, unsigned short port);
         std::vector<std::string> pet_request(const std::string& message, const char* server_ipaddr, unsigned short port);
+        void dissconnect();
 };

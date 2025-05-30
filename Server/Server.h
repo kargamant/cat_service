@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <Handler.h>
+#include <unordered_map>
 
 class Server : public Handler
 {
@@ -13,6 +14,9 @@ class Server : public Handler
         sockaddr_in udp_addr;
         sockaddr_in tcp_addr;
         bool is_listening=false;
+        bool is_connected=false;
+
+        SOCKET last_client;
 
         char* get_ip(sockaddr_in* sockaddr);
     public:
@@ -22,6 +26,7 @@ class Server : public Handler
         char* poll_tcp();
         void respond_udp(const std::string& payload);
         void respond_tcp(const std::string& payload);
+        void send_rst();
 
         std::string get_ip_udp();
         std::string get_ip_tcp();

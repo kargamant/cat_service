@@ -97,7 +97,7 @@ CatResponse Orchestrator::process_pet_request(char* buff)
         {
             auto& vec = user_response_db[response.client_name];
             double total_ignores = (double)std::accumulate(vec.begin(), vec.end(), 0);
-            double chance = total_ignores / vec.size();
+            double chance = total_ignores / (2*vec.size());
             response = cat.pet(response.client_name, chance);
 
             if(response.state == CatState::Bite)
@@ -130,7 +130,7 @@ bool Orchestrator::run_pet()
     char* buf = listen_pet_port();
 
     if(!buf)
-        return false;
+        return true;
 
     std::cout << "processing" << std::endl;
     //printf("buff: %d\n", strlen(buf));
@@ -142,7 +142,7 @@ bool Orchestrator::run_pet()
     offload_db();
 
     if(cat_response.state == CatState::Sleep)
-        return false;
+        server.send_rst();
 
     return true;
 }

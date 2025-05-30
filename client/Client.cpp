@@ -126,3 +126,8 @@ std::vector<std::string> Client::pet_request(const std::string& message, const c
         return responses;
     }
 }
+
+void Client::dissconnect()
+{
+    WSASendDisconnect(SocketTCP, 0);
+}

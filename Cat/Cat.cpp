@@ -44,10 +44,10 @@ CatResponse Cat::process_message(const std::string& msg)
 CatResponse Cat::pet(const std::string& user, double chance)
 {
     int attempt = rand() % 100;
-    if (attempt < chance*100)
-        return {"Bitten by the Cat", user, CatState::Bite};
-    else if (attempt > 90)
+    if (attempt > 90)
         return {"Cat is bored(and drunk). Fell Asleep.", user, CatState::Sleep};
+    else if (attempt < chance*100)
+        return {"Bitten by the Cat", user, CatState::Bite};
     return {"Tolerated by the Cat", user, CatState::Tolerate};
 }
 
