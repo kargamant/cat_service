@@ -151,6 +151,9 @@ void Orchestrator::load_db()
 {
     std::ifstream log{log_file, std::ios::in};
     
+    if(!log.is_open())
+        return;
+
     std::regex log_re{"([a-zA-Z0-9]+) ([0-9])"};
     std::smatch match;
 

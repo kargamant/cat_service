@@ -7,12 +7,21 @@
 
 int main(int argc, char* argv[])
 {
+	std::cout << "Hello" << std::endl;
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2,2), &wsaData);
 	
+	char* ip_addr = argc > 1 ? argv[1] : NULL;
+    if(ip_addr)
+        SERVER_IPADDR = ip_addr;
+
+	std::cout << "Started up on: " << SERVER_IPADDR << std::endl;
+
 	Orchestrator orch{CAT_BUFF_SIZE, SERVER_IPADDR, FEED_PORT, PET_PORT, LOG_FILE_NAME};
 
-	bool tcp_mode = argc > 1 ? !strcmp(argv[1], "-t") : false;
+	std::cout << "Created orch" << std::endl;
+
+	bool tcp_mode = argc > 2 ? !strcmp(argv[2], "-t") : false;
 	while (!kbhit())
 	{
 		std::cout << "Cat is listening..." << std::endl;

@@ -17,8 +17,14 @@ int main(int argc, char* argv[])
 	
     Client client{CAT_BUFF_SIZE, CLIENT_IPADDR};
 
-    bool tcp_mode = argc > 1 ? !strcmp(argv[1], "-t") : false;
+    char* ip_addr = argc > 1 ? argv[1] : NULL;
+    if(ip_addr)
+        SERVER_IPADDR = ip_addr;
     
+    bool tcp_mode = argc > 2 ? !strcmp(argv[2], "-t") : false;
+    
+	std::cout << "Connecting to: " << SERVER_IPADDR << std::endl;
+
     if(tcp_mode && !client.connect_server(SERVER_IPADDR, PET_PORT))
     {
         std::cout << "Initial connect failed" << std::endl;
