@@ -54,6 +54,10 @@ void Orchestrator::feed_response(const std::string& response)
 void Orchestrator::run_feed()
 {
     char* buf = listen_feed_port();
+    
+    // to get up to date data
+    clear_db();
+    load_db();
 
 	std::string cat_response = process_feed_request(buf);
     free(buf);
@@ -132,6 +136,10 @@ bool Orchestrator::run_pet()
     if(!buf)
         return true;
 
+    // to get up to date data
+    clear_db();
+    load_db();
+    
     std::cout << "processing" << std::endl;
     //printf("buff: %d\n", strlen(buf));
     CatResponse cat_response = process_pet_request(buf);
@@ -180,4 +188,9 @@ void Orchestrator::offload_db()
         for(auto& response: user.second)
             log << user.first << " " << response << std::endl;
     }
+}
+
+void Orchestrator::clear_db()
+{
+    user_response_db.clear();
 }
