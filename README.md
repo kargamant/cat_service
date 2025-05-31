@@ -1,6 +1,8 @@
 # cat_service
 This is a simple web-service for feeding a cat... Written with C++ using winsock2 library.  
 
+> This ReadMe only contains info about services themselves. If you want to see info about deployment of all that stuff you can find all materials [here](https://disk.yandex.ru/d/dw5h19AettxfNw)  
+  
 # Basic concept  
 
 There is a special cat on a server side that client can communicate with.  
