@@ -9,3 +9,4 @@ Main_server.txt
 VPN_server.txt
 vpn_key.txt
 .idea/
+*.pyc
